@@ -1,10 +1,8 @@
 ---
 layout: page
-title: About
+title: CV
 permalink: /about/
 ---
-
-# Moussa KAMAL EDDINE
 
 
 ## Education
