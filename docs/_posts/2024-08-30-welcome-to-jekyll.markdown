@@ -32,15 +32,17 @@ For these reasons, I conducted a more elaborate, though still incomplete, benchm
 - **Cutoff Length:** 4096
 
 ### Results:
-| Framework      | Settings                      | # Nodes | Gradient Accumulation | Throughput (tokens/s) | Comments                                                                                      |
-|----------------|-------------------------------|---------|-----------------------|-----------------------|------------------------------------------------------------------------------------------------|
-| **LLaMA Factory** | `accelerate` + FSDP           | 4       | 1                     | 93.6K                 | Throughput = `nnodes` * 23,405 tokens/s                                                        |
-| **Nanotron**     | DP=2, PP=1, TP=8              | 4       | 8                     | 83.3K                 |                                                                                                |
-| **Nanotron**     | DP=4, PP=1, TP=4              | 4       | 4                     | 128K                  |                                                                                                |
-| **Nanotron**     | DP=4, PP=2, TP=2              | 4       | 1                     | 49.2K                 |                                                                                                |
-| **Nanotron**     | DP=4, PP=1, TP=4              | 4       | 1                     | 108K                  |                                                                                                |
-| **Nanotron**     | DP=8, PP=1, TP=4              | 8       | 4                     | 253K                  | Throughput = `nnodes` * 32,000 tokens/s when fixing TP=4 and PP=1                              |
-| **Nanotron**     | DP=4, PP=1, TP=8              | 8       | 8                     | 154K                  |                                                                                                |
+
+| Framework        | Settings          | Nodes | Gradient Accum. (global bs) | Throughput (tokens/s) | 
+|------------------|-------------------|-------|-----------------|-----------------------|
+| **LLaMA Factory**| accelerate + FSDP | 4     | 1   (64)        | 93.6K                 | 
+| **Nanotron**     | DP=2, PP=1, TP=8  | 4     | 8   (64)        | 83.3K                 | 
+| **Nanotron**     | DP=4, PP=1, TP=4  | 4     | 4   (64)        | 128K                  |
+| **Nanotron**     | DP=4, PP=2, TP=2  | 4     | 1   (16)        | 49.2K                 |
+| **Nanotron**     | DP=4, PP=1, TP=4  | 4     | 1   (16)        | 108K                  |
+| **Nanotron**     | DP=8, PP=1, TP=4  | 8     | 4   (256)       | 253K                  |
+| **Nanotron**     | DP=4, PP=1, TP=8  | 8     | 8   (256)       | 154K                  |
+
 
 
 
