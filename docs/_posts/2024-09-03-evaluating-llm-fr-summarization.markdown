@@ -5,6 +5,7 @@ date:   2024-09-03 12:31:34 +0200
 categories: Research findings
 ---
 
+
 In this post, I share intriguing results from my evaluation of six large language models (LLMs) tasked with generating summaries for French conversations. The models I tested were [`Meta-Llama-3-70B-Instruct`](https://huggingface.co/meta-llama/Meta-Llama-3.1-70B-Instruct), [`Meta-Llama-3.1-405B-Instruct-FP8`](https://huggingface.co/meta-llama/Meta-Llama-3.1-405B-Instruct-FP8), [`Meta-Llama-3.1-70B-Instruct`](https://huggingface.co/meta-llama/Meta-Llama-3.1-70B-Instruct), [`Mistral-Large-Instruct-2407`](https://huggingface.co/mistralai/Mistral-Large-Instruct-2407), [`Qwen2-72B-Instruct`](https://huggingface.co/Qwen/Qwen2-72B-Instruct), and [`c4ai-command-r-plus`](https://huggingface.co/CohereForAI/c4ai-command-r-plus). The results were not only interesting but also counter-intuitive, prompting me to share them.
 
 ### Methodology
