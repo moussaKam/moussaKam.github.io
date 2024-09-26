@@ -5,18 +5,20 @@ date:   2024-09-03 12:31:34 +0200
 categories: Research findings
 ---
 
+# 🚧`This blog is still under construction`🚧
+
 In this post, I will walk you through a simple Retrieval-Augmented Generation (RAG) system that leverages Wikipedia content for language generation using a combination of multi-threaded web scraping, text chunking, document encoding, and large language models. Retrieval-Augmented Generation is a powerful technique that allows a model to generate more accurate and contextually relevant responses by retrieving information from a corpus and integrating it into its answer.
 
-The full code can be found here: 
+The full code can be found here: [rag-pipeline-demo](https://github.com/moussaKam/rag-pipeline-demo)
 
 ## why do we need RAG ?
 Even if LLMs are pretrained on extremely large corpora covering almost all human knowledge, they still suffer from hallucinations and factual inaccuracies. The frequency of these hallucinations increases significantly when the size of the LLM decreases or when dealing with languages that are not extensively covered during the pretraining phase. Often, users must choose between expensive, very large models with limited hallucinations and smaller models with a high rate of inaccuracies. This is where Retrieval-Augmented Generation (RAG) comes into play, bridging the gap between large and smaller models by incorporating a retrieval component. This component retrieves relevant documents with factual information and enriches the user’s query, enabling the LLM to produce more accurate and reliable outputs.
 
 To better understand the limitations that RAG addresses, take a ~1.5B parameter model (e.g., `Qwen/Qwen2.5-1.5B-Instruct`) and ask it questions about a specific historical topic in Arabic (for example, `الحرب العالمية الثانية` or "World War II"). Then, ask the same question again, but this time provide context that directly or indirectly contains the answer, and compare the outputs in both cases. I tested this approach, and the results are shown in the screenshots below.
 
-No Context         | With Context
-:-------------------------:|:-------------------------:
-![image](/assets/images/2024-09-26-arabic-rag/no_context.png)| ![image](/assets/images/2024-09-26-arabic-rag/with_context.png)
+|                          No Context                           |                          With Context                           |
+| :-----------------------------------------------------------: | :-------------------------------------------------------------: |
+| ![image](/assets/images/2024-09-26-arabic-rag/no_context.png) | ![image](/assets/images/2024-09-26-arabic-rag/with_context.png) |
 
 
 
@@ -24,16 +26,16 @@ No Context         | With Context
 In summary, RAG automates this process. Instead of manually finding and injecting the relevant context, RAG uses a retriever model to scan a database of documents, retrieve the top documents relevant to the query, and incorporate them into the prompt for the LLM to produce a more accurate response.
 
 
-This tutorial will cover:
-1. Extracting Wikipedia content using Wikipedia's API.
-2. Efficiently handling large-scale data retrieval with multithreading.
-3. Chunking text for better handling by a language model.
-4. Building a document retriever using sentence embeddings.
-5. Using Gradio to create a simple interface for querying the system.
+In this tutorial, we will go through the following steps:
 
-Let's dive into the core code and see how this system works step-by-step.
+1. **Select a Wikipedia page**—for example, [`الحرب العالمية الثانية`](https://ar.wikipedia.org/wiki/%D8%A7%D9%84%D8%AD%D8%B1%D8%A8_%D8%A7%D9%84%D8%B9%D8%A7%D9%84%D9%85%D9%8A%D8%A9_%D8%A7%D9%84%D8%AB%D8%A7%D9%86%D9%8A%D8%A9). We will extract the content of this page along with the content of all referenced pages.
+2. **Chunk the extracted content** into paragraphs of fixed length, with overlapping segments to preserve context.
+3. **Implement a document retriever** using an embedding model, and use it to embed all the chunks.
+4. **Retrieve the most relevant chunks** for the user's query using the document retriever.
+5. **Create an interactive Gradio interface** to handle the user's query and display the results.
 
----
+Let's dive into the core code to see how this system works, step-by-step.
+
 
 ## Extracting Wikipedia Content Using Wikipedia's API
 
@@ -107,16 +109,28 @@ def chunk_text(text, chunk_size=700, overlap=150):
 
 By using overlapping chunks, we preserve context between chunks, improving retrieval results when using a language model.
 
-## Building a Simple Document Retriever with Sentence Embeddings
+## Building a Simple Document Retriever with [BGE-M3](https://huggingface.co/BAAI/bge-m3)
 
-For the retrieval component, I used a sentence-transformer model to encode each chunk. This way, I can search for the most relevant chunks based on the query.
+### How Does It Work?
+BGE-M3 is a **hybrid retrieval model** that combines three different retrieval approaches. 
+
+1. **Lexical Matching:** This method scores chunks based on the presence of exact words from the query, meaning a chunk receives a higher score if it contains surface-level matches with the query text.
+   
+2. **Dense Embedding Similarity:** This approach computes a similarity score between dense embeddings of the query and the chunks, capturing semantic similarities rather than just surface-level matches.
+
+3. **Multi-Vector Retrieval:** This model uses multiple vectors to represent a single text, allowing for a richer representation and more nuanced matching.
+
+For more details, refer to their [paper](https://arxiv.org/pdf/2402.03216).
+
+The first step is to encode all the chunks to produce their embeddings:
 
 ```python
 retriever = Retriever(args.embedding_model, device=args.device)
 retriever.encode_documents(chunks)
 ```
 
-The retriever model will then allow us to rank the chunks and find the top-k most relevant segments based on the query.
+The retriever model then ranks the chunks and retrieves the top-k most relevant segments based on the query.
+
 
 ## Creating a User Interface with Gradio
 
@@ -138,7 +152,3 @@ The complete code ties together web scraping, text processing, and language mode
 You can find the full code [here](link-to-your-github).
 
 I hope this guide helps you understand how to build your own RAG system. Feel free to reach out with any questions or improvements!
-
----
-
-This outline covers the main technical points of your code and presents it in an accessible manner for blog readers. Feel free to expand each section with more details or add visual aids like code snippets and diagrams to make it more engaging.
