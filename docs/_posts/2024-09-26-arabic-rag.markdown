@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Building a Retrieval-Augmented Generation System with Wikipedia and Language Models"
+title:  "Building a RAG System with Wikipedia"
 date:   2024-09-26 12:31:34 +0200
 categories: demo
 ---
