@@ -2,7 +2,7 @@
 layout: post
 title:  "Building a Retrieval-Augmented Generation System with Wikipedia and Language Models"
 date:   2024-09-26 12:31:34 +0200
-categories: Research findings
+categories: demo
 ---
 
 # 🚧`This blog is still under construction`🚧
@@ -10,6 +10,8 @@ categories: Research findings
 In this post, I will walk you through a simple Retrieval-Augmented Generation (RAG) system that leverages Wikipedia content for language generation using a combination of multi-threaded web scraping, text chunking, document encoding, and large language models. Retrieval-Augmented Generation is a powerful technique that allows a model to generate more accurate and contextually relevant responses by retrieving information from a corpus and integrating it into its answer.
 
 The full code can be found here: [rag-pipeline-demo](https://github.com/moussaKam/rag-pipeline-demo)
+
+You can also find a standalone code in this [colab notebook](https://colab.research.google.com/drive/1XXUIyrrkX6Juv5HlIupmQ_ruQM-vNYhL?usp=sharing)
 
 ## why do we need RAG ?
 Even if LLMs are pretrained on extremely large corpora covering almost all human knowledge, they still suffer from hallucinations and factual inaccuracies. The frequency of these hallucinations increases significantly when the size of the LLM decreases or when dealing with languages that are not extensively covered during the pretraining phase. Often, users must choose between expensive, very large models with limited hallucinations and smaller models with a high rate of inaccuracies. This is where Retrieval-Augmented Generation (RAG) comes into play, bridging the gap between large and smaller models by incorporating a retrieval component. This component retrieves relevant documents with factual information and enriches the user’s query, enabling the LLM to produce more accurate and reliable outputs.
@@ -131,24 +133,51 @@ retriever.encode_documents(chunks)
 
 The retriever model then ranks the chunks and retrieves the top-k most relevant segments based on the query.
 
+## Querying the LM
+
+The `instruct` function handles user queries by leveraging both the retriever and generator components of the Retrieval-Augmented Generation (RAG) system. 
+```python
+def instruct(query):
+    indices = retriever.retrieve([query], top_k=args.num_chunks)
+    context = "\n\n".join([chunks[i] for i in indices])
+    prompt = generate_instruct_prompt(query, context, tokenizer)
+    input_ids = tokenizer(prompt, return_tensors="pt")["input_ids"].to(device)
+    streamer = TextIteratorStreamer(
+        tokenizer, timeout=20.0, skip_prompt=True, skip_special_tokens=True
+    )
+    generation_kwargs["input_ids"] = input_ids
+    generation_kwargs["streamer"] = streamer
+    t = Thread(target=model.generate, kwargs=generation_kwargs)
+    t.start()
+    output_text = ""
+    for new_text in streamer:
+        output_text += new_text
+        yield output_text, prompt
+    return output_text, prompt
+```
+When a query is passed to the function, it first uses the **retriever** to fetch the top `k` most relevant chunks from the document collection based the retriever score. These chunks are then combined to create a context, which is integrated into a structured prompt using the `generate_instruct_prompt` function. 
+
 
 ## Creating a User Interface with Gradio
 
-Finally, I built a simple Gradio UI for the RAG system. Gradio is a fantastic library for creating easy-to-use interfaces for machine learning demos. Users can input a query, and the system will display the generated response alongside the supporting context.
+Finally, I built a simple Gradio UI for the RAG system. Gradio is a fantastic library for creating easy-to-use interfaces for machine learning demos. Users can input a query, and the system will display the generated response alongside the supporting context. Now you have a system powered with a relatively small language model that can answer questions about world war II in arabic. You can imagine the same 
 
 ```python
 with gr.Blocks() as demo:
     query = gr.Textbox(lines=3, max_lines=8, interactive=True, label="query", rtl=True)
     answer = gr.Textbox(placeholder="", label="Answer", elem_id="q-input", lines=5, interactive=False, rtl=True)
-    context = gr.Textbox(placeholder="", label="Answer", elem_id="q-input", lines=5, interactive=False, rtl=True, visible=False)
     submit = gr.Button("Submit")
     submit.click(instruct, inputs=query, outputs=[answer, context])
 ```
+
+
 
 ## Conclusion
 
 The complete code ties together web scraping, text processing, and language model inference into a cohesive system. Such a setup can be applied to various use cases, including building chatbots, generating summaries, or creating custom knowledge bases from structured data sources like Wikipedia.
 
-You can find the full code [here](link-to-your-github).
-
 I hope this guide helps you understand how to build your own RAG system. Feel free to reach out with any questions or improvements!
+
+## Acknowledgment
+
+As usual, I would like to thank ChatGPT for helping refine the writing in this post.
