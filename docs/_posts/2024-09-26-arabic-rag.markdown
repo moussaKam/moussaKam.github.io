@@ -170,6 +170,14 @@ with gr.Blocks() as demo:
     submit.click(instruct, inputs=query, outputs=[answer, context])
 ```
 
+## What Can We Improve?
+
+There are several areas for improvement. Let's list a few:
+
+- **Enhancing the Retrieval Database:** Currently, we are using a limited set of Wikipedia pages. Expanding to a larger corpus, such as the entire Wikipedia, would provide a richer knowledge base.
+- **Optimizing the Number of Retrieved Chunks:** Fine-tuning the number of chunks retrieved and their overlap can help achieve a better balance between precision and recall.
+- **Using a Better Retrieval Model:** Consider experimenting with more advanced models like the recently released [jina-embeddings-v3](https://huggingface.co/jinaai/jina-embeddings-v3), which supports Arabic.
+- **Upgrading the LLM:** Finally, using a more powerful language model or an Arabic-specific LLM, such as [Jais](https://huggingface.co/collections/inceptionai/jais-family-66add8bb9c381f5492ddb6f4), could significantly boost performance.
 
 
 ## Conclusion
