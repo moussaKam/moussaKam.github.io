@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Building a Retrieval-Augmented Generation System with Wikipedia and Language Models"
-date:   "2024-09-26"
+date:   2024-09-26 12:31:34 +0200
 categories: Research findings
 ---
 
