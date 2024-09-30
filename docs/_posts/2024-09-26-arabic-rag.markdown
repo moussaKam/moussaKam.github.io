@@ -5,8 +5,6 @@ date:   2024-09-26 12:31:34 +0200
 categories: demo
 ---
 
-# 🚧`This blog is still under construction`🚧
-
 In this post, I will walk you through a simple Retrieval-Augmented Generation (RAG) system that leverages Wikipedia content for language generation using a combination of multi-threaded web scraping, text chunking, document encoding, and large language models. Retrieval-Augmented Generation is a powerful technique that allows a model to generate more accurate and contextually relevant responses by retrieving information from a corpus and integrating it into its answer.
 
 The full code can be found here: [rag-pipeline-demo](https://github.com/moussaKam/rag-pipeline-demo)
